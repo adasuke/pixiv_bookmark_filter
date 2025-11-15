@@ -11,8 +11,8 @@
     "build:extension:dev": "NODE_ENV=production BUILD_MODE=development next build && npm run copy:files && npm run fix:next",
     "copy:icons": "mkdir -p public/icons && cp -r assets/icons/* public/icons/ 2>/dev/null || true",
     "copy:files": "cp public/manifest.json out/manifest.json && cp public/content.js out/content.js && cp public/popup.html out/popup.html && cp public/popup.js out/popup.js && cp -r public/icons out/",
-    "fix:next": "mv out/_next out/next && find out -type f -name '*.html' -exec sed -i '' 's/_next/next/g' {} + && find out -type f -name '*.js' -exec sed -i '' 's/_next/next/g' {} +",
-    "strip:logs": "sed -i '' -E '/console\\.(log|debug|info)\\(/d' out/content.js && sed -i '' -E '/console\\.(log|debug|info)\\(/d' out/popup.js",
+    "fix:next": "mv out/_next out/next && node -e \"const fs=require('fs');const path=require('path');function processDir(dir){fs.readdirSync(dir,{withFileTypes:true}).forEach(f=>{const p=path.join(dir,f.name);if(f.isDirectory())processDir(p);else if(/\\.(html|js)$/.test(f.name)){const c=fs.readFileSync(p,'utf8');fs.writeFileSync(p,c.replace(/_next/g,'next'))}})}processDir('out')\"",
+    "strip:logs": "node -e \"const fs=require('fs');['out/content.js','out/popup.js'].forEach(f=>{if(fs.existsSync(f)){const c=fs.readFileSync(f,'utf8').split('\\n').filter(l=>!/console\\.(log|debug|info)\\(/.test(l)).join('\\n');fs.writeFileSync(f,c)}})\"",
     "start": "next start",
     "lint": "next lint"
   },
