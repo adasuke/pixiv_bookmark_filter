@@ -1,5 +1,4 @@
 // ポップアップのJavaScript
-console.log("[Popup] スクリプト読み込み開始");
 
 // DOM要素の取得
 const filterEnabledToggle = document.getElementById("filterEnabled");
@@ -9,15 +8,11 @@ const statusMessage = document.getElementById("statusMessage");
 
 // 初期化: 保存済みの設定を読み込む
 async function loadSettings() {
-  console.log("[Popup] 設定を読み込み中...");
-
   try {
     const result = await chrome.storage.sync.get({
       filterEnabled: false,
       bookmarkThreshold: 100,
     });
-
-    console.log("[Popup] 読み込んだ設定:", result);
 
     filterEnabledToggle.checked = result.filterEnabled;
     bookmarkThresholdInput.value = result.bookmarkThreshold;
@@ -29,8 +24,6 @@ async function loadSettings() {
 
 // 設定を保存する
 async function saveSettings() {
-  console.log("[Popup] 設定を保存中...");
-
   const filterEnabled = filterEnabledToggle.checked;
   const bookmarkThreshold = parseInt(bookmarkThresholdInput.value, 10);
 
@@ -44,11 +37,8 @@ async function saveSettings() {
     bookmarkThreshold,
   };
 
-  console.log("[Popup] 保存する設定:", settings);
-
   try {
     await chrome.storage.sync.set(settings);
-    console.log("[Popup] 設定を保存しました");
     showStatus("設定を保存しました", "success");
 
     // コンテンツスクリプトに設定変更を通知
@@ -61,14 +51,10 @@ async function saveSettings() {
 
 // コンテンツスクリプトに設定変更を通知
 async function notifyContentScripts(settings) {
-  console.log("[Popup] コンテンツスクリプトに通知中...");
-
   try {
     const tabs = await chrome.tabs.query({
       url: "https://www.pixiv.net/tags/*/novels*",
     });
-
-    console.log(`[Popup] 対象タブ数: ${tabs.length}`);
 
     for (const tab of tabs) {
       try {
@@ -76,7 +62,6 @@ async function notifyContentScripts(settings) {
           type: "SETTINGS_UPDATED",
           settings,
         });
-        console.log(`[Popup] タブ ${tab.id} に通知しました`);
       } catch (error) {
         console.warn(`[Popup] タブ ${tab.id} への通知に失敗:`, error);
       }
@@ -105,5 +90,3 @@ filterEnabledToggle.addEventListener("change", saveSettings);
 
 // 初期化
 loadSettings();
-
-console.log("[Popup] スクリプト初期化完了");
