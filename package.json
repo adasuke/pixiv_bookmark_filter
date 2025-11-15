@@ -1,0 +1,36 @@
+{
+  "name": "nextjs-chrome-extension",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "prebuild:extension": "npm run copy:icons",
+    "prebuild:extension:dev": "npm run copy:icons",
+    "build:extension": "NODE_ENV=production BUILD_MODE=production next build && npm run copy:files && npm run fix:next && npm run strip:logs",
+    "build:extension:dev": "NODE_ENV=production BUILD_MODE=development next build && npm run copy:files && npm run fix:next",
+    "copy:icons": "mkdir -p public/icons && cp -r assets/icons/* public/icons/ 2>/dev/null || true",
+    "copy:files": "cp public/manifest.json out/manifest.json && cp public/content.js out/content.js && cp public/popup.html out/popup.html && cp public/popup.js out/popup.js && cp -r public/icons out/",
+    "fix:next": "mv out/_next out/next && find out -type f -name '*.html' -exec sed -i '' 's/_next/next/g' {} + && find out -type f -name '*.js' -exec sed -i '' 's/_next/next/g' {} +",
+    "strip:logs": "sed -i '' -E '/console\\.(log|debug|info)\\(/d' out/content.js && sed -i '' -E '/console\\.(log|debug|info)\\(/d' out/popup.js",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "next": "^14.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "@types/chrome": "^0.0.268",
+    "typescript": "^5",
+    "eslint": "^8",
+    "eslint-config-next": "^14.2.0"
+  },
+  "volta": {
+    "node": "20.19.5"
+  }
+}

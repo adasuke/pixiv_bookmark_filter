@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pixiv Bookmark Filter</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        width: 320px;
+        padding: 20px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+          "Helvetica", "Arial", sans-serif;
+        background: #f5f5f5;
+      }
+
+      .container {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        font-size: 18px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 20px;
+        text-align: center;
+      }
+
+      .setting-row {
+        margin-bottom: 20px;
+      }
+
+      .setting-label {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        color: #555;
+      }
+
+      /* トグルスイッチのスタイル */
+      .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 48px;
+        height: 26px;
+      }
+
+      .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: 0.3s;
+        border-radius: 26px;
+      }
+
+      .toggle-slider:before {
+        position: absolute;
+        content: "";
+        height: 20px;
+        width: 20px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: 0.3s;
+        border-radius: 50%;
+      }
+
+      input:checked + .toggle-slider {
+        background-color: #0096fa;
+      }
+
+      input:checked + .toggle-slider:before {
+        transform: translateX(22px);
+      }
+
+      input[type="number"] {
+        width: 100%;
+        padding: 10px 12px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: border-color 0.2s;
+      }
+
+      input[type="number"]:focus {
+        outline: none;
+        border-color: #0096fa;
+      }
+
+      .button {
+        width: 100%;
+        padding: 12px;
+        background: #0096fa;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+        margin-top: 10px;
+      }
+
+      .button:hover {
+        background: #0077cc;
+      }
+
+      .button:active {
+        transform: scale(0.98);
+      }
+
+      .status-message {
+        margin-top: 12px;
+        padding: 10px;
+        border-radius: 6px;
+        font-size: 13px;
+        text-align: center;
+        display: none;
+      }
+
+      .status-message.success {
+        background: #e8f5e9;
+        color: #2e7d32;
+        display: block;
+      }
+
+      .status-message.error {
+        background: #ffebee;
+        color: #c62828;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>📚 Pixiv ブックマークフィルター</h1>
+
+      <div class="setting-row">
+        <div class="setting-label">
+          <span>フィルター有効</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="filterEnabled" />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="setting-row">
+        <label class="setting-label" for="bookmarkThreshold">
+          <span>ブックマーク数しきい値</span>
+        </label>
+        <input
+          type="number"
+          id="bookmarkThreshold"
+          min="0"
+          value="100"
+          placeholder="例: 100"
+        />
+      </div>
+
+      <button class="button" id="saveButton">保存</button>
+
+      <div class="status-message" id="statusMessage"></div>
+    </div>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

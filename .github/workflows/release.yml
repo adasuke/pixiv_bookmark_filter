@@ -1,0 +1,65 @@
+name: Build and Release Chrome Extension
+
+on:
+  push:
+    tags:
+      - "v*.*.*" # v1.0.0 のようなタグがpushされた時に実行
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build extension (Production)
+        run: npm run build:extension
+
+      - name: Create zip file
+        run: |
+          cd out
+          zip -r ../pixiv-bookmark-filter-${{ github.ref_name }}.zip .
+          cd ..
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: pixiv-bookmark-filter-${{ github.ref_name }}.zip
+          body: |
+            ## Pixiv Bookmark Filter ${{ github.ref_name }}
+
+            ### インストール方法
+
+            1. zipファイルをダウンロード
+            2. zipファイルを解凍
+            3. Chromeで `chrome://extensions/` を開く
+            4. 右上の「デベロッパーモード」を有効化
+            5. 「パッケージ化されていない拡張機能を読み込む」をクリック
+            6. 解凍したフォルダを選択
+
+            ### 機能
+
+            - Pixivの小説一覧ページで、指定したブックマーク数以下の作品を非表示にします
+            - トグルスイッチでフィルターのON/OFF切り替え
+            - ブックマーク数のしきい値をカスタマイズ可能
+            - リアルタイム反映（ページリロード不要）
+
+            ### 使い方
+
+            1. 拡張機能アイコンをクリック
+            2. 「フィルター有効」トグルをONにする
+            3. 「ブックマーク数しきい値」を設定（デフォルト: 100）
+            4. 「保存」ボタンをクリック
+
+            設定は自動的に保存され、すぐに反映されます。
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
