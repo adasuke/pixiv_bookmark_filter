@@ -4,6 +4,13 @@ on:
   push:
     tags:
       - "dev-v*.*.*" # dev-v1.0.0 のようなタグで開発用ビルドを実行
+  workflow_dispatch: # 手動実行を可能にする
+    inputs:
+      version:
+        description: "リリースバージョン (例: dev-v1.0.0)"
+        required: true
+        default: "dev-v1.0.0"
+        type: string
 
 jobs:
   build-dev:
@@ -24,19 +31,29 @@ jobs:
       - name: Build extension (Development)
         run: npm run build:extension:dev
 
+      - name: Get version
+        id: get_version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "VERSION=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+          fi
+
       - name: Create zip file
         run: |
           cd out
-          zip -r ../pixiv-bookmark-filter-dev-${{ github.ref_name }}.zip .
+          zip -r ../pixiv-bookmark-filter-dev-${{ steps.get_version.outputs.VERSION }}.zip .
           cd ..
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          files: pixiv-bookmark-filter-dev-${{ github.ref_name }}.zip
+          tag_name: ${{ steps.get_version.outputs.VERSION }}
+          files: pixiv-bookmark-filter-dev-${{ steps.get_version.outputs.VERSION }}.zip
           prerelease: true
           body: |
-            ## Pixiv Bookmark Filter (Development Build) ${{ github.ref_name }}
+            ## Pixiv Bookmark Filter (Development Build) ${{ steps.get_version.outputs.VERSION }}
 
             ⚠️ **これは開発用ビルドです**
 

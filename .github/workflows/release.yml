@@ -4,6 +4,13 @@ on:
   push:
     tags:
       - "v*.*.*" # v1.0.0 のようなタグがpushされた時に実行
+  workflow_dispatch: # 手動実行を可能にする
+    inputs:
+      version:
+        description: "リリースバージョン (例: v1.0.0)"
+        required: true
+        default: "v1.0.0"
+        type: string
 
 jobs:
   build:
@@ -24,16 +31,26 @@ jobs:
       - name: Build extension (Production)
         run: npm run build:extension
 
+      - name: Get version
+        id: get_version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "VERSION=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+          fi
+
       - name: Create zip file
         run: |
           cd out
-          zip -r ../pixiv-bookmark-filter-${{ github.ref_name }}.zip .
+          zip -r ../pixiv-bookmark-filter-${{ steps.get_version.outputs.VERSION }}.zip .
           cd ..
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          files: pixiv-bookmark-filter-${{ github.ref_name }}.zip
+          tag_name: ${{ steps.get_version.outputs.VERSION }}
+          files: pixiv-bookmark-filter-${{ steps.get_version.outputs.VERSION }}.zip
           body: |
             ## Pixiv Bookmark Filter ${{ github.ref_name }}
 
