@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Pixiv Bookmark Filter",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Pixivの一覧ページから指定ブックマーク数以下の作品を非表示にする",
   "action": {
     "default_popup": "popup.html",
