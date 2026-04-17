@@ -53,7 +53,10 @@ async function saveSettings() {
 async function notifyContentScripts(settings) {
   try {
     const tabs = await chrome.tabs.query({
-      url: "https://www.pixiv.net/tags/*/novels*",
+      url: [
+        "https://www.pixiv.net/tags/*/novels*",
+        "https://www.pixiv.net/search*",
+      ],
     });
 
     for (const tab of tabs) {

@@ -25,7 +25,10 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://www.pixiv.net/tags/*/novels*"],
+      "matches": [
+        "https://www.pixiv.net/tags/*/novels*",
+        "https://www.pixiv.net/search*"
+      ],
       "js": ["content.js"],
       "run_at": "document_end"
     }

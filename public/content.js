@@ -23,13 +23,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 // フィルターを適用する関数
 function applyFilter() {
   // 小説一覧のアイテムを取得
-  // GTMトラッキング用のクラスを持つa要素を含むli要素を探す（これらのクラスは変わりにくい）
-  const coverLinks = document.querySelectorAll(
-    'a[class*="gtm-novel-searchpage-result-cover"]'
+  // data-ga4-entity-id属性で小説アイテムのdivを直接取得
+  const novelItems = Array.from(
+    document.querySelectorAll('div[data-ga4-entity-id^="novel/"]'),
   );
-  const novelItems = Array.from(coverLinks)
-    .map((link) => link.closest("li"))
-    .filter((li) => li !== null);
 
   if (novelItems.length === 0) {
     return;
@@ -105,10 +102,13 @@ const observer = new MutationObserver((mutations) => {
   mutations.forEach((mutation) => {
     if (mutation.addedNodes.length > 0) {
       mutation.addedNodes.forEach((node) => {
-        // li要素が追加された場合
+        // 小説アイテムのdiv要素が追加された場合
         if (
-          node.nodeName === "LI" ||
-          (node.querySelector && node.querySelector("li"))
+          (node.nodeType === 1 &&
+            node.matches &&
+            node.matches('div[data-ga4-entity-id^="novel/"]')) ||
+          (node.querySelector &&
+            node.querySelector('div[data-ga4-entity-id^="novel/"]'))
         ) {
           shouldReapply = true;
         }
